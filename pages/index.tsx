@@ -1,16 +1,22 @@
-import sequelize from "lib/db";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 export default function Home() {
-  const testCon = async () => {
-    try {
-      await sequelize.authenticate();
-      console.log("Connection has been established successfully.");
-    } catch (error) {
-      console.error("Unable to connect to the database:", error);
+  const router = useRouter();
+  const { query } = router;
+
+  useEffect(() => {
+    if (query.hasOwnProperty("toast")) {
+      toast("Ha sido autenticado exitosamente!", { type: "success" });
     }
-  };
+  }, [query]);
 
-  testCon();
-
-  return <div>Home</div>;
+  return <div className="w-full h-screen"></div>;
 }
+
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//   return {
+//     props: { text: "This is the home page!" },
+//   };
+// };
