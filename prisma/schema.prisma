@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// * Enums
+enum Position {
+  DEVELOPER
+  LEAD
+}
+
+enum Role {
+  DEVELOPER
+  LEAD
+  ADMIN
+}
+
+enum TicketType {
+  FRONT
+  END
+}
+
+enum TicketState {
+  OPEN
+  PROGRESS
+  CLOSED
+}
+
+// * Models
+
+model User {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  firstName    String
+  lastName     String
+  email        String   @unique
+  username     String?  @unique
+  position     Position @default(DEVELOPER)
+  role         Role     @default(DEVELOPER)
+  passwordHash String
+  passwordSalt String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  Ticket       Ticket[]
+  TicketAction TicketAction[]
+}
+
+model Ticket {
+  id                  String     @id @default(auto()) @map("_id") @db.ObjectId
+  title               String
+  description         String
+  type                TicketType @default(FRONT)
+  expectedClosingDate String
+  creator             User       @relation(fields: [createdBy], references: [id])
+  createdBy           String     @db.ObjectId
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  TicketAction TicketAction[]
+}
+
+model TicketAction {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  ticket    Ticket @relation(fields: [ticketId], references: [id])
+  ticketId  String @db.ObjectId
+  creator   User   @relation(fields: [createdBy], references: [id])
+  createdBy String @db.ObjectId
+}
